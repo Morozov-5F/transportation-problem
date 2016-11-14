@@ -7,26 +7,24 @@ RM = rm -rf
 C_FILES = main.c
 
 C_FLAGS  = -ansi -Wall -Wpedantic
-LDFLAGS	 = -L/usr/local/lib
 # Shared libraries to link
 L_FILES  = gsl gslcblas m
 # Include folders
-I_PATH   = /usr/local/include
 
 OBJS      = $(patsubst %.c, %.o, $(C_FILES))
 TOREMOVE += $(patsubst %.c, %.o, $(C_FILES))
 TOREMOVE += $(patsubst %.c, %.d, $(C_FILES))
 TOREMOVE += $(addsuffix .dbg,    $(TARGET))
 
+lp: $(OBJS)
+	$(LD) $(LDFLAGS) $^ $(addprefix -l, $(L_FILES)) -o $@
+
 run: lp
 	@chmod +x lp
 	./lp
 
-lp: $(OBJS)
-	$(LD) $(LDFLAGS) $^ $(addprefix -l, $(L_FILES)) -o $@
-
 %.o: %.c
-	$(CC) $(CFLAGS) -MD -c $< -o $@
+	$(CC) $(CFLAGS) -MD -c $(addprefix -I, $(I_PATH)) $< -o $@
 
 clean:
 	$(RM) $(TOREMOVE)
